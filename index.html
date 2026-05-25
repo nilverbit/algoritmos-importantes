@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bubble Sort — Algoritmos Importantes</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2333;
+    --border: rgba(255,255,255,0.08);
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --blue: #4f8ef7;
+    --blue-dim: rgba(79,142,247,0.15);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.15);
+    --green: #34d399;
+    --green-dim: rgba(52,211,153,0.12);
+    --gray-bar: #3a3f52;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+  }
+
+  /* header */
+  header {
+    width: 100%;
+    max-width: 760px;
+    margin-bottom: 36px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--blue);
+    border: 1px solid rgba(79,142,247,.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  h1 span { color: var(--blue); }
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* code block */
+  .code-block {
+    width: 100%;
+    max-width: 760px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .code-lang { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: auto; }
+  pre {
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .op { color: #89ddff; }
+  .cm { color: #546e7a; font-style: italic; }
+  .num { color: #f78c6c; }
+  .var { color: #eeffff; }
+
+  /* visualizer card */
+  .card {
+    width: 100%;
+    max-width: 760px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+  }
+
+  /* vars row */
+  .vars-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .var-chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--muted);
+  }
+  .var-chip b { color: var(--text); }
+
+  /* arrow row */
+  .arrow-row {
+    display: flex;
+    gap: 5px;
+    height: 22px;
+    margin-bottom: 4px;
+  }
+  .arrow-cell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--blue);
+    transition: opacity .2s;
+  }
+
+  /* bars */
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 200px;
+    margin-bottom: 6px;
+  }
+  .bar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .bar-rect {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    transition: height .3s cubic-bezier(.4,0,.2,1), background .3s;
+  }
+  .idx-row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  .idx-cell {
+    flex: 1;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    transition: color .2s;
+  }
+  .idx-cell.active { color: var(--blue); }
+
+  /* info box */
+  .info-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    min-height: 58px;
+    margin-bottom: 18px;
+    transition: border-color .3s;
+  }
+  .info-box.is-swap { border-color: rgba(245,158,11,.4); }
+  .info-box.is-done { border-color: rgba(52,211,153,.4); }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .pill-cmp  { background: var(--blue-dim);  color: var(--blue); }
+  .pill-swap { background: var(--amber-dim); color: var(--amber); }
+  .pill-ok   { background: var(--green-dim); color: var(--green); }
+  .pill-skip { background: rgba(255,255,255,.05); color: var(--muted); border: 1px solid var(--border); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(255,255,255,.06);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+
+  /* controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  button {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    transition: background .15s, border-color .15s, transform .1s;
+  }
+  button:hover:not(:disabled) { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); }
+  button:active:not(:disabled) { transform: scale(.97); }
+  button:disabled { opacity: .35; cursor: default; }
+  button.primary {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+  }
+  button.primary:hover { background: #3a7de8; }
+
+  .progress {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* legend */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .ldot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* explanation section */
+  .explain {
+    width: 100%;
+    max-width: 760px;
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 540px) { .explain { grid-template-columns: 1fr; } }
+  .explain-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .explain-card h3 {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--blue);
+    letter-spacing: .06em;
+    margin-bottom: 10px;
+  }
+  .explain-card p {
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.7;
+  }
+  .explain-card p b { color: var(--text); font-weight: 500; }
+
+  footer {
+    margin-top: 40px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Estructuras de Datos o Algoritmos · 2026-I</div>
+  <h1>Bubble <span>Sort</span></h1>
+  <p class="subtitle">Ordenamiento de burbuja — visualización paso a paso</p>
+</header>
+
+<div class="code-block">
+  <div class="code-header">
+    <div class="dot dot-r"></div>
+    <div class="dot dot-y"></div>
+    <div class="dot dot-g"></div>
+    <span class="code-lang">Python</span>
+  </div>
+  <pre><span class="var">lista</span> <span class="op">=</span> [<span class="num">14</span>, <span class="num">8</span>, <span class="num">16</span>, <span class="num">11</span>, <span class="num">20</span>, <span class="num">9</span>, <span class="num">15</span>]
+<span class="var">arr</span>   <span class="op">=</span> lista[:]          <span class="cm"># copia del original</span>
+<span class="var">n</span>     <span class="op">=</span> <span class="fn">len</span>(arr)
+
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(n):
+    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span>(n<span class="op">-</span>i<span class="op">-</span><span class="num">1</span>):   <span class="cm"># ignora los ya ordenados</span>
+        <span class="kw">if</span> arr[j] <span class="op">&lt;</span> arr[j<span class="op">+</span><span class="num">1</span>]:  <span class="cm"># mayor a la izquierda</span>
+            arr[j], arr[j<span class="op">+</span><span class="num">1</span>] <span class="op">=</span> arr[j<span class="op">+</span><span class="num">1</span>], arr[j]
+
+<span class="var">arr</span>  <span class="cm"># → [20, 16, 15, 14, 11, 9, 8]</span></pre>
+</div>
+
+<div class="card">
+  <div class="vars-row" id="vars"></div>
+  <div class="arrow-row" id="arrows"></div>
+  <div class="bars" id="bars"></div>
+  <div class="idx-row" id="idxrow"></div>
+  <div class="info-box" id="info"></div>
+  <div class="controls">
+    <button id="btn-prev" onclick="go(-1)">← Anterior</button>
+    <button class="primary" id="btn-next" onclick="go(1)">Siguiente →</button>
+    <button onclick="restart()">↺ Reiniciar</button>
+    <span class="progress" id="prog"></span>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="ldot" style="background:#4f8ef7"></div> comparando</div>
+    <div class="legend-item"><div class="ldot" style="background:#f59e0b"></div> intercambiando</div>
+    <div class="legend-item"><div class="ldot" style="background:#34d399"></div> ya ordenado</div>
+    <div class="legend-item"><div class="ldot" style="background:#3a3f52"></div> sin tocar</div>
+  </div>
+</div>
+
+<div class="explain">
+  <div class="explain-card">
+    <h3>// bucle externo i</h3>
+    <p>Controla las <b>pasadas</b>. Cada pasada garantiza que el elemento más pequeño restante "burbujea" hasta su posición final al final del array.</p>
+  </div>
+  <div class="explain-card">
+    <h3>// bucle interno j</h3>
+    <p>Compara pares vecinos <b>arr[j]</b> vs <b>arr[j+1]</b>. Si el de la izquierda es menor, los intercambia. Va de 0 hasta <b>n-i-1</b> porque los últimos <b>i</b> ya están fijos.</p>
+  </div>
+  <div class="explain-card">
+    <h3>// ¿por qué n-i-1?</h3>
+    <p>Cada pasada deja un elemento fijo al final. Reanalizarlos sería trabajo inútil, así que el límite del bucle interno <b>se reduce en 1</b> cada pasada.</p>
+  </div>
+  <div class="explain-card">
+    <h3>// orden descendente</h3>
+    <p>El <b>if arr[j] &lt; arr[j+1]</b> mueve el mayor hacia la izquierda. Cambiándolo a <b>&gt;</b> ordenaría de menor a mayor.</p>
+  </div>
+</div>
+
+<footer>Algoritmos Importantes · Estructuras de Datos · 2026-I</footer>
+
+<script>
+const ORIG = [14, 8, 16, 11, 20, 9, 15];
+const N = ORIG.length;
+const MAX_V = 20;
+
+function buildSteps() {
+  let arr = [...ORIG], steps = [];
+  steps.push({ arr:[...arr], j:-1, i:-1, phase:'start', fixedFrom:N,
+    msg:'Array inicial: [14, 8, 16, 11, 20, 9, 15]<br>Vamos a ordenar de <b>mayor a menor</b>. El bucle <code>i</code> controla las pasadas; el <code>j</code> compara pares vecinos.' });
+
+  for (let i = 0; i < N; i++) {
+    const limit = N - i - 1;
+    steps.push({ arr:[...arr], j:-1, i, phase:'pass-start', fixedFrom:N-i,
+      msg:`<span class="pill pill-cmp">Pasada i=${i}</span> El bucle <code>j</code> irá de 0 hasta <b>${limit-1}</b> — o sea <code>n-i-1 = ${N}-${i}-1 = ${limit}</code> comparaciones. Últimos ${i} elemento${i===1?'':'s'} ya fijos.` });
+    for (let j = 0; j < limit; j++) {
+      const ws = arr[j] < arr[j+1];
+      steps.push({ arr:[...arr], j, i, phase:'compare', fixedFrom:N-i,
+        msg: ws
+          ? `<span class="pill pill-swap">intercambio</span> <code>arr[${j}]=${arr[j]}</code> &lt; <code>arr[${j+1}]=${arr[j+1]}</code> → el de la derecha es mayor, se intercambian ↔`
+          : `<span class="pill pill-skip">sin cambio</span> <code>arr[${j}]=${arr[j]}</code> ≥ <code>arr[${j+1}]=${arr[j+1]}</code> → ya están en orden correcto.` });
+      if (ws) {
+        [arr[j], arr[j+1]] = [arr[j+1], arr[j]];
+        steps.push({ arr:[...arr], j, i, phase:'swap', fixedFrom:N-i,
+          msg:`<span class="pill pill-swap">↕ intercambiados</span> Posición ${j} → <b>${arr[j]}</b>, posición ${j+1} → <b>${arr[j+1]}</b>.` });
+      }
+    }
+    steps.push({ arr:[...arr], j:-1, i, phase:'pass-done', fixedFrom:N-1-i,
+      msg:`<span class="pill pill-ok">pasada ${i} lista</span> El valor <b>${arr[N-1-i]}</b> quedó fijo en posición ${N-1-i}. Se ignora en la siguiente pasada.` });
+  }
+  steps.push({ arr:[...arr], j:-1, i:-1, phase:'done', fixedFrom:0,
+    msg:`<span class="pill pill-ok">✓ terminado</span> Array ordenado de mayor a menor: <b>[${arr.join(', ')}]</b>` });
+  return steps;
+}
+
+const STEPS = buildSteps();
+let cur = 0;
+
+function barColor(s, i) {
+  if (s.phase === 'done' || i >= s.fixedFrom) return '#34d399';
+  if ((s.phase === 'compare' || s.phase === 'swap') && (i === s.j || i === s.j+1))
+    return s.phase === 'swap' ? '#f59e0b' : '#4f8ef7';
+  return '#3a3f52';
+}
+
+function render() {
+  const s = STEPS[cur];
+
+  document.getElementById('vars').innerHTML =
+    `<div class="var-chip">i = <b>${s.i>=0?s.i:'—'}</b></div>` +
+    `<div class="var-chip">j = <b>${s.j>=0?s.j:'—'}</b></div>` +
+    `<div class="var-chip">n-i-1 = <b>${s.i>=0?N-s.i-1:'—'}</b></div>` +
+    `<div class="var-chip">arr = <b>[${s.arr.join(', ')}]</b></div>`;
+
+  document.getElementById('arrows').innerHTML = s.arr.map((_,i) => {
+    const show = (i===s.j||i===s.j+1) && s.phase==='compare';
+    return `<div class="arrow-cell">${show?'▼':''}</div>`;
+  }).join('');
+
+  document.getElementById('bars').innerHTML = s.arr.map((v,i) => {
+    const h = Math.round(20 + (v/MAX_V)*170);
+    const bg = barColor(s,i);
+    return `<div class="bar"><div class="bar-rect" style="height:${h}px;background:${bg}">${v}</div></div>`;
+  }).join('');
+
+  document.getElementById('idxrow').innerHTML = s.arr.map((_,i)=>{
+    const act = i===s.j||i===s.j+1;
+    return `<div class="idx-cell${act?' active':''}">[${i}]</div>`;
+  }).join('');
+
+  const infoEl = document.getElementById('info');
+  infoEl.innerHTML = s.msg;
+  infoEl.className = 'info-box' +
+    (s.phase==='swap'?' is-swap':s.phase==='done'||s.phase==='pass-done'?' is-done':'');
+
+  document.getElementById('prog').textContent = `${cur+1} / ${STEPS.length}`;
+  document.getElementById('btn-prev').disabled = cur===0;
+  document.getElementById('btn-next').disabled = cur===STEPS.length-1;
+}
+
+function go(d) { cur=Math.max(0,Math.min(STEPS.length-1,cur+d)); render(); }
+function restart() { cur=0; render(); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); go(1); }
+  if (e.key==='ArrowLeft') go(-1);
+});
+
+render();
+</script>
+</body>
+</html>
